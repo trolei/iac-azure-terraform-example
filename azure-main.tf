@@ -1,8 +1,8 @@
 #Configure the state location
 terraform {
   backend "azurerm" {
-    resource_group_name   = "mindummetrlrg"
-    storage_account_name  = "mindummetrlsa"
+    resource_group_name   = "mintrl-rg"
+    storage_account_name  = "mintrlsa"
     container_name        = "tfstate"
     key                   = "terraform.tfstate"
   }
@@ -139,6 +139,35 @@ resource "azurerm_linux_virtual_machine" "azure-web-vm" {
     name              = "${var.app_name}-${var.app_environment}-web-vm-os-disk"
     caching           = "ReadWrite"
     storage_account_type = "Standard_LRS"
+  }
+
+
+  # It's easy to transfer files or templates using Terraform.
+  provisioner "file" {
+    source      = "files/setup.sh"
+    destination = "/home/${var.linux_admin_user}/setup.sh"
+
+    connection {
+      type     = "ssh"
+      user     = var.linux_admin_user
+      password = var.linux_admin_password
+      host     = azurerm_public_ip.azure-web-ip.ip_address
+    }
+  }
+
+  # This shell script starts our Apache server and prepares the demo environment.
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /home/${var.linux_admin_user}/setup.sh",
+      "sudo /home/${var.linux_admin_user}/setup.sh",
+    ]
+
+    connection {
+      type     = "ssh"
+      user     = var.linux_admin_user
+      password = var.linux_admin_password
+      host     = azurerm_public_ip.azure-web-ip.ip_address
+    }
   }
 
   tags = {
