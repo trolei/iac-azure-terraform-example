@@ -32,6 +32,7 @@ variable "linux_admin_user" {
 variable "linux_admin_password" {
   type        = string
   description = "Linux VM Admin Password"
+  
 }
 
 # Linux VM Hostname
