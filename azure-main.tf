@@ -1,3 +1,13 @@
+#Configure the state location
+terraform {
+  backend "azurerm" {
+    resource_group_name   = "mindummetrlrg"
+    storage_account_name  = "mindummetrlsa"
+    container_name        = "tfstate"
+    key                   = "terraform.tfstate"
+  }
+}
+
 #Configure the Azure Provider
 provider "azurerm" {
   version = ">= 2.33"
